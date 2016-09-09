@@ -1,0 +1,15 @@
+main: com.myplugin.tower.Main
+name: Tower
+version: 1.0
+author: Tomas
+description: The Watchtower plugin
+commands:
+  addtower:
+    description: Add a new tower
+    usage: "Correct usage: /addtower <name>"
+  removetower:
+    description: Remove a tower
+    usage: "Correct usage: /removetower <name>"
+  listtowers:
+    description: Lists all the towers in your faction
+    usage: "Correct usage: /listtowers"
