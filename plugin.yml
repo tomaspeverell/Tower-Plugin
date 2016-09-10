@@ -10,6 +10,6 @@ commands:
   removetower:
     description: Remove a tower
     usage: "Correct usage: /removetower <name>"
-  listtowers:
+  towerlist:
     description: Lists all the towers in your faction
-    usage: "Correct usage: /listtowers"
+    usage: "Correct usage: /towerlist"

@@ -1,31 +1,15 @@
 package com.myplugin.tower;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.EntityEffect;
 import org.bukkit.Location;
-import org.bukkit.Server;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Arrow.Spigot;
 import org.bukkit.entity.SpectralArrow;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.metadata.MetadataValue;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.permissions.PermissionAttachmentInfo;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
 public class Tower {
@@ -42,6 +26,7 @@ public class Tower {
 	public static final int TWILIGHT = 13000;
 	public static final int DAWN = 22000;
 	
+	public static final Material TOWER_BLOCK_TYPE = Material.OBSIDIAN;
 	private static final World w = Bukkit.getWorlds().get(0);
 	
 	private ArrayList<Player> playersList;
@@ -86,6 +71,8 @@ public class Tower {
 	
 	public void tick() {
 		//Bukkit.broadcastMessage(name + " ticked.");
+		if(w.getBlockAt(x, y, z).getType() != TOWER_BLOCK_TYPE)
+			w.getBlockAt(x, y, z).setType(TOWER_BLOCK_TYPE);
 		for(Player p : playersList) {
 			if(Math.random() * (1 / ODDS)  > 1.0) return;
 			Location l = p.getLocation();
@@ -93,10 +80,10 @@ public class Tower {
 			Arrow a;
 			if(p.getPotionEffect(PotionEffectType.INVISIBILITY) != null 
 				&& p.getPotionEffect(PotionEffectType.GLOWING) == null)
-				a = w.spawnArrow(new Location(w, x, y, z), v, SPEED, SPREAD, SpectralArrow.class);
+				a = w.spawnArrow(new Location(w, x + 1, y, z), v, SPEED, SPREAD, SpectralArrow.class);
 			else {
-				a = w.spawnArrow(new Location(w, x, y, z), v, SPEED, SPREAD);
-				if(Math.random() * (1 / FIRE_ODDS)  > 1.0) return;
+				a = w.spawnArrow(new Location(w, x + 1, y, z), v, SPEED, SPREAD);
+				if(Math.random() * (1 / FIRE_ODDS)  <= 1.0)
 					a.setFireTicks(10000000);
 			}
 			a.setCustomName("the " + name + " archer");

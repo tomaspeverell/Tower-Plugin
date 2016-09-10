@@ -97,7 +97,7 @@ public class Main extends JavaPlugin {
 					}
 				}
 			}
-			else if(command.getLabel().equals("listtowers")) {
+			else if(command.getLabel().equals("towerlist")) {
 				String team = getTeam((Player) sender);
 				if(team == null) {
 					sender.sendMessage("You are not part of a team");

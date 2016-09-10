@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
@@ -38,24 +39,34 @@ public class TowersListRunnable implements Runnable {
 	public boolean addNewTower(int x, int y, int z, int chunk_x, int chunk_z, String team, String name) {
 		if(getTower(team, name) != null) return false;
 		activeTowers.add(new Tower(x, y, z, chunk_x, chunk_z, team, name));
+		Bukkit.getWorlds().get(0).getBlockAt(x, y, z).setType(Tower.TOWER_BLOCK_TYPE);
 		return true;
 	}
 	
 	public boolean removeTower(String team, String name) {
 		Tower t = getTower(team, name);
+		return removeTower(t);
+	}
+	
+	public boolean removeTower(Tower t) {
 		if(t == null) return false;
-		else {
-			activeTowers.remove(t);
-			inactiveTowers.remove(t);
-		}
+		
+		activeTowers.remove(t);
+		inactiveTowers.remove(t);
+		Bukkit.getWorlds().get(0).getBlockAt(t.getX(), t.getY(), t.getZ()).setType(Material.AIR);
+		
 		return true;
+	}
+	
+	public void removeIfTower(int x, int y, int z) {
+		removeTower(getTower(x, y, z));
 	}
 	
 	public void loadTower(int chunk_x, int chunk_z) {
 		for(Tower t : inactiveTowers) 
 			if(t.isTowerChunk(chunk_x, chunk_z)) {
 				activeTowers.add(t);
-				Bukkit.broadcastMessage("Tower " + t.getName() + " is active");
+				//Bukkit.broadcastMessage("Tower " + t.getName() + " is active");
 				inactiveTowers.remove(t);
 				break;
 			}
@@ -65,7 +76,7 @@ public class TowersListRunnable implements Runnable {
 		for(Tower t : activeTowers) 
 			if(t.isTowerChunk(chunk_x, chunk_z)) {
 				inactiveTowers.add(t);
-				Bukkit.broadcastMessage("Tower " + t.getName() + " is inactive");
+				//Bukkit.broadcastMessage("Tower " + t.getName() + " is inactive");
 				activeTowers.remove(t);
 				break;
 			}		
@@ -175,5 +186,14 @@ public class TowersListRunnable implements Runnable {
 		return null;
 	}
 	
+	private Tower getTower(int x, int y, int z) {
+		for(Tower t : activeTowers)
+			if(t.getX() == x && t.getY() == y && t.getZ() == z)
+				return t;
+		for(Tower t : inactiveTowers) 
+			if(t.getX() == x && t.getY() == y && t.getZ() == z)
+				return t;
+		return null;
+	}
 	
 }
