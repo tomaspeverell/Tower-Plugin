@@ -19,30 +19,45 @@ public class Main extends JavaPlugin {
 	private static final String gamerule = "activeTowers";
 	private static final String path = "plugins/Tower/list.yaml";
 	
+	private boolean ruleDisabled = false;
+	
 	TowersListRunnable towers;
-	private int runnableId;
+	PlayerVelocityRunnable velocities;
+	
+	private int towersId, velocitiesId;
 	
 	@Override
 	public void onEnable() {
 		Bukkit.broadcastMessage("Hi y'all");
 		World w = Bukkit.getWorlds().get(0);
-		if(w.isGameRule(gamerule) && w.getGameRuleValue(gamerule).equals("false"))
+		if(w.isGameRule(gamerule) && w.getGameRuleValue(gamerule).equals("false")) {
+			ruleDisabled = true;
 			Bukkit.getServer().getPluginManager().disablePlugin(this);
-		towers = TowersListRunnable.getInstance();
-		towers.readFile(path);
-		Bukkit.getServer()
-			  .getPluginManager()
-			  .registerEvents(new EventListener(towers), this);
-		runnableId = Bukkit.getServer()
-						   .getScheduler()
-						   .scheduleSyncRepeatingTask(this, towers, 0L, TowersListRunnable.PERIOD);
-		super.onEnable();
+		} else {
+			towers = TowersListRunnable.getInstance();
+			towers.readFile(path);
+			velocities = PlayerVelocityRunnable.getInstance();
+			
+			Bukkit.getServer()
+				  .getPluginManager()
+				  .registerEvents(new EventListener(towers, velocities), this);
+			towersId = Bukkit.getServer()
+							 .getScheduler()
+							 .scheduleSyncRepeatingTask(this, towers, 0L, TowersListRunnable.PERIOD);
+			velocitiesId = Bukkit.getServer()
+					   			 .getScheduler()
+					   			 .scheduleSyncRepeatingTask(this, velocities, 0L, PlayerVelocityRunnable.PERIOD);
+			super.onEnable();
+		}
 	}
 	
 	@Override
 	public void onDisable() {
-		Bukkit.getServer().getScheduler().cancelTask(runnableId);
-		towers.writeFile(path);
+		if(!ruleDisabled) {
+			Bukkit.getServer().getScheduler().cancelTask(towersId);
+			Bukkit.getServer().getScheduler().cancelTask(velocitiesId);
+			towers.writeFile(path);
+		}
 		Bukkit.broadcastMessage("Bye y'all");
 		super.onDisable();
 	}

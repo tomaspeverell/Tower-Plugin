@@ -6,15 +6,29 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
 public class EventListener implements Listener {
 	TowersListRunnable towers;
+	PlayerVelocityRunnable velocities;
 	
-	public EventListener(TowersListRunnable towers) {
+	public EventListener(TowersListRunnable towers, PlayerVelocityRunnable velocities) {
 		this.towers = towers;
+		this.velocities = velocities;
+	}
+	
+	@EventHandler 
+	public void onLogin(PlayerLoginEvent event) {
+		velocities.addPlayer(event.getPlayer());
+	}
+	
+	@EventHandler 
+	public void onLogout(PlayerQuitEvent event) {
+		velocities.removePlayer(event.getPlayer());
 	}
 	
 	@EventHandler

@@ -11,7 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class TowersListRunnable implements Runnable {
-	public static final long PERIOD = 2L;
+	public static final long PERIOD = 2L; //reduce
 
 	private  ArrayList<Tower> activeTowers;
 	private  ArrayList<Tower> inactiveTowers;
