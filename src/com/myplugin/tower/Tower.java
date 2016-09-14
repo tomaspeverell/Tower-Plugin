@@ -28,7 +28,8 @@ public class Tower {
 	private static final float ARROW_DRAG = 0.01f;
 	private static final float ARROW_T_VEL = 5.0f;
 	
-	private static final float ARROW_TIME = 20.0f; //2.5 seconds of flight 
+	private static final float MAX_FLY_TIME = 50.0f; //2.5 seconds of flight 
+	private static final float MIN_FLY_TIME = 12.5f; 
 	
 	private static final int TWILIGHT = 13000;
 	private static final int DAWN = 22000;
@@ -86,8 +87,9 @@ public class Tower {
 		for(Player p : playersList) {
 			if(shouldShoot()) {
 				Location playerLocation = p.getEyeLocation();
-				Vector playerVelocity = PlayerVelocityRunnable.getVelocity(p);
+				Vector playerVelocity = PlayerVelocityRunnable.getVelocity(p, randomVelocityPrecision());
 				Location arrowOrigin = new Location(w, x, y + 2, z); //two above the tower block
+				float flyTime = randomFlyTime();
 				/*
 				Vector arrowVelocity = (new Vector(playerLocation.getX() - arrowOrigin.getX(),
 												  playerLocation.getY() - arrowOrigin.getY(),
@@ -96,9 +98,9 @@ public class Tower {
 												  .multiply(SPEED);
 				*/
 				Vector arrowVelocity = new Vector(
-						vox(playerLocation, arrowOrigin, playerVelocity), 
-						voy(playerLocation, arrowOrigin, playerVelocity), 
-						voz(playerLocation, arrowOrigin, playerVelocity));
+						vox(playerLocation, arrowOrigin, playerVelocity, flyTime), 
+						voy(playerLocation, arrowOrigin, playerVelocity, flyTime), 
+						voz(playerLocation, arrowOrigin, playerVelocity, flyTime));
 				
 				Arrow a; 
 				if(p.getPotionEffect(PotionEffectType.INVISIBILITY) != null 
@@ -115,70 +117,46 @@ public class Tower {
 		}
 	}
 	
-	private float vox(Location player, Location origin, Vector playerVelocity) {
-		/*
-		return (float)((player.getBlockX() 
-			  + playerVelocity.getX() * ARROW_TIME 
-			  + (1. / ARROW_DRAG) * Math.exp(-1 * ARROW_DRAG) 
-			  - origin.getX())
-			  / ARROW_TIME);
-		*/
-		//return (float) (ARROW_DRAG * Math.exp(ARROW_DRAG * ARROW_TIME) * (origin.getX() - player.getX()));
+	private float vox(Location player, Location origin, Vector playerVelocity, float flyTime) {
 		return (float) (
-				(player.getX() - origin.getX()  + playerVelocity.getX() * ARROW_TIME)
-				/ (1.0 - Math.exp(-1.0 * ARROW_G * ARROW_TIME / ARROW_T_VEL))
+				(player.getX() - origin.getX()  + playerVelocity.getX() * flyTime)
+				/ (1.0 - Math.exp(-1.0 * ARROW_G * flyTime / ARROW_T_VEL))
 				* (ARROW_G / ARROW_T_VEL)
 				);
 	}
 	
-	private float voy(Location player, Location origin, Vector playerVelocity) {
-		/*
-		return (float)((player.getBlockY() 
-				  + playerVelocity.getY() * ARROW_TIME 
-				  - origin.getY()
-				  - ARROW_G * (1. / ARROW_DRAG) * ARROW_TIME)
-				  * ARROW_DRAG
-				  * Math.exp(ARROW_DRAG * ARROW_TIME)
-				  + ARROW_G / ARROW_DRAG);
-		*/
-		/*return (float)(((
-				player.getY()
-				- origin.getY())
-				+ (ARROW_G * Math.pow(ARROW_TIME, 2.0) / 2.0))
-				/ ARROW_TIME);	
-				 
-		*/
+	private float voy(Location player, Location origin, Vector playerVelocity, float flyTime) {
 		return (float)(
-				(player.getY() - origin.getY() + playerVelocity.getY() * ARROW_TIME + ARROW_T_VEL * ARROW_TIME)
-				/ (1.0 - Math.exp(-1.0 * ARROW_G * ARROW_TIME / ARROW_T_VEL))
+				(player.getY() - origin.getY() + playerVelocity.getY() * flyTime + ARROW_T_VEL * flyTime)
+				/ (1.0 - Math.exp(-1.0 * ARROW_G * flyTime / ARROW_T_VEL))
 				* (ARROW_G / ARROW_T_VEL)
 				- ARROW_T_VEL
 				);
 	}
 	
-	private float voz(Location player, Location origin, Vector playerVelocity) {
-		/*
-		return (float)((player.getBlockZ() 
-				  + playerVelocity.getZ() * ARROW_TIME 
-				  + (1. / ARROW_DRAG) * Math.exp(-1 * ARROW_DRAG) 
-				  - origin.getZ())
-				  / ARROW_TIME);
-		 */
-		//return (float) (-1.0 * ARROW_DRAG * Math.exp(ARROW_DRAG * ARROW_TIME) * (origin.getZ() - player.getZ()));
+	private float voz(Location player, Location origin, Vector playerVelocity, float flyTime) {
 		return (float) (
-				(player.getZ() - origin.getZ() + playerVelocity.getZ() * ARROW_TIME)
-				/ (1.0 - Math.exp(-1.0 * ARROW_G * ARROW_TIME / ARROW_T_VEL))
+				(player.getZ() - origin.getZ() + playerVelocity.getZ() * flyTime)
+				/ (1.0 - Math.exp(-1.0 * ARROW_G * flyTime / ARROW_T_VEL))
 				* (ARROW_G / ARROW_T_VEL)
 				);
 	}
 	
 	private boolean shouldShoot() {
-		//return true;
-		return Math.random() * (1 / ODDS)  <= 1.0;
+		return true;
+		//return Math.random() * (1 / ODDS)  <= 1.0;
 	}
 	
 	private boolean shouldShootFlame() {
 		return Math.random() * (1 / FIRE_ODDS)  <= 1.0;
+	}
+	
+	private float randomFlyTime() {
+		return (float)(Math.random() * (MAX_FLY_TIME - MIN_FLY_TIME) + MIN_FLY_TIME);
+	}
+	
+	private int randomVelocityPrecision() {
+		return (int)(Math.random() * (PlayerVelocityRunnable.MEMORY - 1) + 1);
 	}
 	
 	public String getTeam() {

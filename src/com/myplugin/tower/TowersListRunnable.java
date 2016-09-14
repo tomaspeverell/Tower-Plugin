@@ -21,7 +21,6 @@ public class TowersListRunnable implements Runnable {
 	public static TowersListRunnable getInstance() {
 		if(me == null)
 			me = new TowersListRunnable();
-		
 		return me;
 	}
 
@@ -56,6 +55,12 @@ public class TowersListRunnable implements Runnable {
 		Bukkit.getWorlds().get(0).getBlockAt(t.getX(), t.getY(), t.getZ()).setType(Material.AIR);
 		
 		return true;
+	}
+	
+	public boolean isFriendlyTower(int x, int y, int z, String team) {
+		if(getTower(x, y, z) == null)
+			return false;
+		return getTower(x, y, z).getTeam().equals(team);
 	}
 	
 	public void removeIfTower(int x, int y, int z) {

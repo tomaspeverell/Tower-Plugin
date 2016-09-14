@@ -61,6 +61,9 @@ public class EventListener implements Listener {
 			return;
 		if(b.getType() != Tower.TOWER_BLOCK_TYPE)
 			return;
-		towers.removeIfTower(b.getX(), b.getY(), b.getZ());
+		if(towers.isFriendlyTower(b.getX(), b.getY(), b.getZ(), Main.getTeam(event.getPlayer())))
+			event.setCancelled(true);
+		else
+			towers.removeIfTower(b.getX(), b.getY(), b.getZ());	
 	}
 }
